@@ -1,0 +1,60 @@
+# Inference and ablation contract used for the release tables.
+protocol_version: 2
+model_name: PepSite
+model_scope:
+  phase2: primary_mlm_site
+  adapter: none
+alphabet:
+  allowed: ACDEFGHIKLMNPQRSTVWYX
+  x_allowed: true
+  canonical20_only: false
+routes:
+  - id: 01_mlm_site
+    label: MLM+Site
+    role: baseline_ablation
+    source: phase2_mlm_site_generation
+    screening: none
+    xr_rounds: 0
+  - id: 02_two_score
+    label: MLM+Site → two-score screening
+    role: screening_ablation
+    source: phase2_mlm_site_generation
+    screening: two_score
+    xr_rounds: 0
+  - id: 03_mlm_site_xr1
+    label: MLM+Site → XR (one round)
+    role: xr_ablation
+    source: phase2_mlm_site_generation
+    screening: none
+    xr_rounds: 1
+  - id: 04_two_score_xr1
+    label: MLM+Site → two-score screening → XR (one round)
+    role: formal_route
+    source: phase2_mlm_site_generation
+    screening: two_score
+    xr_rounds: 1
+screening:
+  components:
+    - source_mean_logp
+    - site_chemistry
+  weights:
+    source_mean_logp: 1.0
+    site_chemistry: 1.0
+  normalization: per_query_z_score
+  zscore_standard_deviation: population_ddof_0
+  utility: "z(site_chemistry) + z(source_mean_logp)"
+  selection: utility_descending_then_ppl_gate
+  ppl_gate: "selected_ppl / baseline_ppl <= 1.05"
+  composition_l1_max: 0.75
+  length_and_alphabet_gate: exact_length_and_allowed_alphabet
+  fallback: baseline_sequence_if_gate_fails
+x_repair:
+  rounds: 1
+  mutable_positions: positions_containing_X_in_parent_only
+  non_x_positions_must_remain_identical: true
+  unresolved_x_policy: retain_and_mark
+sampling:
+  proposal_count: 64
+  top_k: 3
+  temperature: 1.0
+  run_scope: one_model_for_complete_route

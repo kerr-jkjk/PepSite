@@ -1,0 +1,37 @@
+# Frozen primary Phase 1 protocol. Run randomization is supplied by the
+# generic configs/reproducibility.yaml file or the launcher CLI.
+protocol_version: 1
+phase: phase1_site_only_warmup
+initializer: raw_esm2_checkpoint
+epochs: 20
+trainable:
+  site_head: true
+  unfreeze_last_n_layers: 4
+  layer_indices_for_esm_t33: [29, 30, 31, 32]
+  lm_head: false
+loss:
+  site_pos_weight: 4.0
+  site_loss_weight: 1.0
+  mlm_loss_weight: 0.0
+optimizer:
+  type: AdamW
+  site_head_learning_rate: 0.0003
+  backbone_learning_rate: 0.000002
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+scheduler:
+  type: constant
+  implementation: no_op_fixed_learning_rates
+data:
+  batch_size: 8
+  eval_batch_size: 16
+  gradient_accumulation_steps: 1
+  max_length: 552
+  num_workers: 2
+runtime:
+  fp16_on_cuda: true
+  deterministic_seed_initialization: true
+outputs:
+  final_model: phase1/final_model
+  loss_tables: [batch_metrics.csv, epoch_metrics.csv, loss_history.csv]
+  figures: [total_loss_curve.png, mlm_loss_curve.png, site_loss_curve.png, two_stage_combined_loss.png]

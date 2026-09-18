@@ -1,0 +1,17 @@
+# Paths are repository-relative and may be replaced by CLI arguments.
+data:
+  train_csv: data/train_site_head_5A.csv
+  val_csv: data/val_site_head_5A.csv
+  test_csv: data/test_site_head_5A.csv
+  max_length: 552
+  filter_binding_site_status: ok
+  columns:
+    receptor: [protein_sequence, Receptor Sequence]
+    ligand: [ligand_sequence, Binder]
+    site_mask: receptor_binding_site_mask
+    query_id: query_id
+  site_mask_encoding: binary_string
+  allowed_residue_alphabet: ACDEFGHIKLMNPQRSTVWYX
+  # The historical loader truncates at max_length; prepare_data.py reports
+  # overlength rows so that truncation is visible in the manifest.
+  overlength_policy: report_and_match_loader_truncation

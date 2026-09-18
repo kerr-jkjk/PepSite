@@ -1,0 +1,22 @@
+# Model identity for the strict PepSite training route.
+# Weights are intentionally not committed to this repository.
+model:
+  name: PepSite
+  family: ESM-2
+  architecture: EsmForMaskedLMWithSiteHead
+  variant: esm2_t33_650M_UR50D
+  hidden_size: 1280
+  num_hidden_layers: 33
+  vocab_size: 33
+  max_position_embeddings: 1026
+  raw_checkpoint: models/esm2_t33_650M_UR50D_hf_raw
+  tokenizer: models/PepSite
+  site_head:
+    type: linear
+    output_size: 1
+  vocabulary_policy:
+    # ESM's vocab contains additional unknown/ambiguous symbols.  The
+    # published sequence route deliberately permits canonical residues + X.
+    generation_alphabet: ACDEFGHIKLMNPQRSTVWYX
+    x_allowed: true
+    canonical20_only: false

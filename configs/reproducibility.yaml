@@ -1,0 +1,11 @@
+# Reproducibility defaults for the published PepSite model.
+#
+# `random_seed` is an implementation detail for rerunning this release.  It is
+# deliberately not a model label, result-directory name, or registry ID.
+protocol_version: 1
+random_seed: 42
+seed_policy: any_non_negative_integer
+seed_scope:
+  phase1: one_run
+  phase2: phase1_initializer_from_same_run
+  inference: phase2_initializer_from_same_run

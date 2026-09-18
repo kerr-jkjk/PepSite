@@ -1,0 +1,36 @@
+# Frozen primary Phase 2 protocol, initialized from the matching Phase 1
+# final_model. Phase 2 uses one AdamW learning rate for all parameters.
+protocol_version: 1
+phase: phase2_mlm_site_joint
+initializer: matching_phase1_final_model
+epochs: 5
+trainable:
+  all_parameters: true
+loss:
+  site_pos_weight: 3.0
+  site_loss_weight: 1.0
+  mlm_loss_weight: 1.0
+optimizer:
+  type: AdamW
+  learning_rate: 0.0007984276816171436
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+scheduler:
+  type: cosine
+  warmup_ratio: 0.1
+data:
+  batch_size: 4
+  eval_batch_size: 16
+  gradient_accumulation_steps: 2
+  max_length: 552
+  # Trainer's evaluation DataLoader in the audited run used its default.
+  num_workers: 0
+runtime:
+  fp16_on_cuda: true
+selection:
+  metric: eval_total_loss
+  direction: minimize
+outputs:
+  final_model: phase2/final_model
+  loss_tables: [batch_metrics.csv, epoch_metrics.csv, loss_history.csv]
+  figures: [total_loss_curve.png, mlm_loss_curve.png, site_loss_curve.png, two_stage_combined_loss.png]
